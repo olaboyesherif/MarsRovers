@@ -1,0 +1,80 @@
+﻿@page "/spinleft"
+@inject  IRoverService  _roverService
+@inject  NavigationManager _navigationManager
+@inject  IJSRuntime _jsRuntime
+
+<div   class ="row my-2" >
+      <h3 class="card-title text-primary">@Title Spin Left</h3>
+    <div class="col-10 offset-2">
+       
+        <EditForm Model="rover" OnValidSubmit="spinleft" >
+             <DataAnnotationsValidator/>
+            <div class="form-group">
+                <label >x coordinte of the rovers</label>
+                <InputNumber  @bind-Value="rover.x" class="form-control"></InputNumber>
+          <ValidationMessage For="()=>rover.x"/>
+            </div>
+             <div class="form-group">
+                <label >y coordinte of the rovers</label>
+                <InputNumber  @bind-Value="rover.y" class="form-control"></InputNumber>
+          <ValidationMessage For="()=>rover.y"/>
+           </div>
+             <div class="form-group">
+                <label >direction</label>
+                <InputText  @bind-Value="rover.direction" class="form-control"></InputText>
+          <ValidationMessage For="()=>rover.direction"/>
+            </div>
+                   <div class="form-group py-2">
+        <button   class="btn btn-primary"> @Title</button>
+        <NavLink href="" class="btn btn-secondary"> Back to Index</NavLink>
+
+                  </div>  
+        </EditForm>
+     
+</div>      
+</div>    
+@code {
+    [Parameter]
+    public string Code { get; set; } = null;
+    public RoverDTO rover  { get; set; } = new RoverDTO();
+    public string Title { get; set; } = "Spin Left";
+    public bool IsLoading { get; set; } = true;
+     protected override async Task OnInitializedAsync()
+    {
+       
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+      
+             if (firstRender)
+        {
+            if (Code == null)
+            {
+                // create 
+                IsLoading = false;
+            }
+           
+        }
+    }
+    private async Task LoadCategory()
+    {
+        IsLoading = true;
+        StateHasChanged();
+        IsLoading = false;
+        StateHasChanged();
+    }
+    private async Task spinleft()
+    {
+      
+            var create =   await  _roverService.SpinLeft(rover);
+            if(create !=null)
+            {
+                await _jsRuntime.InvokeVoidAsync("ShowSwal","success", create );
+            }
+            else
+            {
+                await _jsRuntime.InvokeVoidAsync("ShowSwal","error","null");
+            }
+        _navigationManager.NavigateTo("/spinleft");
+    }
+}

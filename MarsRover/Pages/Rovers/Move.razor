@@ -1,0 +1,84 @@
+﻿@page "/move"
+@inject  IRoverService  _roverService
+@inject  NavigationManager _navigationManager
+@inject  IJSRuntime _jsRuntime
+
+<div   class ="row my-2" >
+      <h3 class="card-title text-primary">@Title Move Rovers</h3>
+    <div class="col-10 offset-2">
+        
+        <EditForm Model="rover" OnValidSubmit="UpsertMove" >
+             <DataAnnotationsValidator/>
+            <div class="form-group">
+                <label >x coordinte of the rovers</label>
+                <InputNumber  @bind-Value="rover.x" class="form-control"></InputNumber>
+          <ValidationMessage For="()=>rover.x"/>
+            </div>
+            
+              <div class="form-group">
+                <label >y coordinte of the rovers</label>
+                <InputNumber  @bind-Value="rover.y" class="form-control"></InputNumber>
+         <ValidationMessage For="()=>rover.y"/>
+            </div>
+             <div class="form-group">
+                <label >direction</label>
+                <InputText  @bind-Value="rover.direction" class="form-control"></InputText>
+          <ValidationMessage For="()=>rover.direction"/>
+            </div>
+              <div class="form-group">
+                <label >roverCommand</label>
+                <InputText  @bind-Value="rover.roverCommand" class="form-control"></InputText>
+          <ValidationMessage For="()=>rover.roverCommand"/>
+            </div>
+                   <div class="form-group py-2">
+        <button   class="btn btn-primary"> @Title</button>
+        <NavLink href="" class="btn btn-secondary"> Back to Index</NavLink>
+
+                  </div>  
+        </EditForm>
+       
+</div>      
+</div> 
+@code {
+    public MoveDTO rover  { get; set; } = new MoveDTO();
+    public string Title { get; set; } = "Move";
+    public bool IsLoading { get; set; } = true;
+    RoverDTO roverDTO = new RoverDTO();
+     protected override async Task OnInitializedAsync()
+    {
+       
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // create 
+            IsLoading = false;
+
+        }
+    }
+    private async Task LoadCategory()
+    {
+        IsLoading = true;
+        StateHasChanged();
+        IsLoading = false;
+        StateHasChanged();
+    }
+    private async Task UpsertMove()
+    {
+        roverDTO.direction = rover.direction;
+        roverDTO.x = rover.x;
+        roverDTO.y = rover.y;
+
+        var create =   await  _roverService.Move(roverDTO ,rover.roverCommand );
+            if(create !=null)
+            {
+                await _jsRuntime.InvokeVoidAsync("ShowSwal","success", create );
+            }
+            else
+            {
+                await _jsRuntime.InvokeVoidAsync("ShowSwal","error","null");
+            }
+        _navigationManager.NavigateTo("/move");
+    }
+}
